@@ -1,6 +1,8 @@
 import { memo } from "react";
 import { log } from "../../log.js";
 
+//restricting the unnecessary execution of functional component with memo
+
 const IconButton = memo(function ({ children, icon, ...props }) {
   log("<IconButton /> rendered", 2);
 
