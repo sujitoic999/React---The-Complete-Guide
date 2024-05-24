@@ -1,17 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useState } from "react";
 
-import IconButton from '../UI/IconButton.jsx';
-import MinusIcon from '../UI/Icons/MinusIcon.jsx';
-import PlusIcon from '../UI/Icons/PlusIcon.jsx';
-import CounterOutput from './CounterOutput.jsx';
-import { log } from '../../log.js';
+import IconButton from "../UI/IconButton.jsx";
+import MinusIcon from "../UI/Icons/MinusIcon.jsx";
+import PlusIcon from "../UI/Icons/PlusIcon.jsx";
+import CounterOutput from "./CounterOutput.jsx";
+import { log } from "../../log.js";
 
 function isPrime(number) {
-  log(
-    'Calculating if is prime number',
-    2,
-    'other'
-  );
+  log("Calculating if is prime number", 2, "other");
   if (number <= 1) {
     return false;
   }
@@ -28,24 +24,29 @@ function isPrime(number) {
 }
 
 export default function Counter({ initialCount }) {
-  log('<Counter /> rendered', 1);
+  log("<Counter /> rendered", 1);
   const initialCountIsPrime = isPrime(initialCount);
 
   const [counter, setCounter] = useState(initialCount);
 
-  function handleDecrement() {
-    setCounter((prevCounter) => prevCounter - 1);
-  }
+  //Note this useCallback() stop recreation of  handleIncrement and handleDecrement after the rerendering
+  //of this functional component until any of dependecy changes it won't be recreated
+  //when this functional component rerender all the internal variables objects and function use to recreate with different memory
+  //address so useCallback() hook stop unnecessary recreation of functions
 
-  function handleIncrement() {
+  const handleDecrement = useCallback(function handleDecrement() {
+    setCounter((prevCounter) => prevCounter - 1);
+  }, []);
+
+  const handleIncrement = useCallback(function handleIncrement() {
     setCounter((prevCounter) => prevCounter + 1);
-  }
+  }, []);
 
   return (
     <section className="counter">
       <p className="counter-info">
-        The initial counter value was <strong>{initialCount}</strong>. It{' '}
-        <strong>is {initialCountIsPrime ? 'a' : 'not a'}</strong> prime number.
+        The initial counter value was <strong>{initialCount}</strong>. It{" "}
+        <strong>is {initialCountIsPrime ? "a" : "not a"}</strong> prime number.
       </p>
       <p>
         <IconButton icon={MinusIcon} onClick={handleDecrement}>
