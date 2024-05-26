@@ -1,13 +1,14 @@
-import { useCallback, useState } from "react";
-
+import { useState, memo, useCallback, useMemo } from "react";
 import IconButton from "../UI/IconButton.jsx";
 import MinusIcon from "../UI/Icons/MinusIcon.jsx";
 import PlusIcon from "../UI/Icons/PlusIcon.jsx";
 import CounterOutput from "./CounterOutput.jsx";
 import { log } from "../../log.js";
+import CounterHistory from "./CounterHistory.jsx";
 
 function isPrime(number) {
   log("Calculating if is prime number", 2, "other");
+
   if (number <= 1) {
     return false;
   }
@@ -23,23 +24,38 @@ function isPrime(number) {
   return true;
 }
 
-export default function Counter({ initialCount }) {
+const Counter = memo(function Counter({ initialCount }) {
   log("<Counter /> rendered", 1);
-  const initialCountIsPrime = isPrime(initialCount);
 
-  const [counter, setCounter] = useState(initialCount);
+  const initialCountIsPrime = useMemo(
+    () => isPrime(initialCount),
+    [initialCount]
+  );
 
-  //Note this useCallback() stop recreation of  handleIncrement and handleDecrement after the rerendering
-  //of this functional component until any of dependecy changes it won't be recreated
-  //when this functional component rerender all the internal variables objects and function use to recreate with different memory
-  //address so useCallback() hook stop unnecessary recreation of functions
+  // const [counter, setCounter] = useState(initialCount);
+  const [counterChanges, setCounterChanges] = useState([
+    { value: initialCount, id: Math.random() * 1000 },
+  ]);
+
+  const currentCounter = counterChanges.reduce(
+    (prevCounter, counterChange) => prevCounter + counterChange.value,
+    0
+  );
 
   const handleDecrement = useCallback(function handleDecrement() {
-    setCounter((prevCounter) => prevCounter - 1);
+    // setCounter((prevCounter) => prevCounter - 1);
+    setCounterChanges((prevCounterChanges) => [
+      { value: -1, id: Math.random() * 1000 },
+      ...prevCounterChanges,
+    ]);
   }, []);
 
   const handleIncrement = useCallback(function handleIncrement() {
-    setCounter((prevCounter) => prevCounter + 1);
+    // setCounter((prevCounter) => prevCounter + 1);
+    setCounterChanges((prevCounterChanges) => [
+      { value: 1, id: Math.random() * 1000 },
+      ...prevCounterChanges,
+    ]);
   }, []);
 
   return (
@@ -52,11 +68,14 @@ export default function Counter({ initialCount }) {
         <IconButton icon={MinusIcon} onClick={handleDecrement}>
           Decrement
         </IconButton>
-        <CounterOutput value={counter} />
+        <CounterOutput value={currentCounter} />
         <IconButton icon={PlusIcon} onClick={handleIncrement}>
           Increment
         </IconButton>
       </p>
+      <CounterHistory history={counterChanges} />
     </section>
   );
-}
+});
+
+export default Counter;
