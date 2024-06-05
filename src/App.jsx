@@ -15,9 +15,16 @@ function App() {
   }
 
   function handleSetClick() {
+    // setChosenCount((enteredNumber) => enteredNumber + 1);
+    // console.log("jkfdjgjkjdg", chosenCount);
+    // setEnteredNumber(0);
+    // console.log("enteredNumber", enteredNumber); for experiment
     setChosenCount(enteredNumber);
-    setEnteredNumber(0);
+    setChosenCount((prevChosenCount) => prevChosenCount + 1);
+    // setEnteredNumber(0);
   }
+
+  console.log("experiment on chosen count", chosenCount);
 
   return (
     <div>
